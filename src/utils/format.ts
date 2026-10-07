@@ -36,3 +36,11 @@ export function formatDocument(
   }
   return valueToFormat
 }
+
+export function formatCurrency(
+  value: number,
+  locale: string,
+  currency: string
+) {
+  return value.toLocaleString(locale, { style: "currency", currency })
+}

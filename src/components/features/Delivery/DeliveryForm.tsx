@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { Controller, useFormContext } from "react-hook-form"
 import type { DeliveryFormData } from "./schema"
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
@@ -13,11 +13,12 @@ import {
 import { Spinner } from "@/components/ui/spinner"
 import { toast } from "@/components/ui/toast"
 import { FieldDelivery } from "./FieldDelivery"
+import { useBoundStore } from "@/stores"
 
 export function DeliveryForm() {
   const { setValue, clearErrors, control } = useFormContext<DeliveryFormData>()
   const { mutateAsync, data, isPending, isError } = useMutationPerCep()
-  const [randomDay, setRandomDay] = useState<number>(1)
+  const setDaysOfDelivery = useBoundStore((state) => state.setDaysOfDelivery)
 
   const isErrorCepData = !!(data && "erro" in data) || isError
   const cepData = data && !isErrorCepData ? data : undefined
@@ -81,13 +82,13 @@ export function DeliveryForm() {
                   ) {
                     mutateAsync(sanitizedCep(digits))
                       .then((response) => {
-                        setRandomDay(
+                        setDaysOfDelivery(
                           "erro" in response
                             ? 1
                             : Math.floor(Math.random() * 10) + 1
                         )
                       })
-                      .catch(() => setRandomDay(1))
+                      .catch(() => setDaysOfDelivery(1))
                   }
                 }}
               />
@@ -185,7 +186,7 @@ export function DeliveryForm() {
         )}
       />
 
-      {!isErrorCepData && <FieldDelivery randomDay={randomDay} />}
+      {!isErrorCepData && <FieldDelivery />}
     </>
   )
 }

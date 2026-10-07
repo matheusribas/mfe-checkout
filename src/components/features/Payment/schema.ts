@@ -3,17 +3,17 @@ import * as z from "zod"
 
 export const formPaymentSchema = z
   .object({
-    type: z.enum(["credit-card", "pix", "boleto"]),
+    paymentType: z.enum(["credit-card", "pix", "boleto"]),
     cardNumber: z.string().optional(),
     cardholderName: z.string().optional(),
-    expirationDate: z.string().optional(),
-    securityCode: z.string().optional(),
+    cardExpirationDate: z.string().optional(),
+    cardSecurityCode: z.string().optional(),
     cardholderIdentification: z.string().optional(),
     cardholderIdentificationType: z.enum(["cpf", "cnpj"]),
     installments: z.number().optional().nullable(),
   })
   .superRefine((data, context) => {
-    const typeCreditCardSelected = data.type === "credit-card"
+    const typeCreditCardSelected = data.paymentType === "credit-card"
 
     if (typeCreditCardSelected) {
       if (!data.cardNumber) {
@@ -37,16 +37,19 @@ export const formPaymentSchema = z
           message: "Campo obrigatório",
         })
       }
-      if (!data.expirationDate || !/^\d{4}$/.test(data.expirationDate)) {
+      if (
+        !data.cardExpirationDate ||
+        !/^\d{4}$/.test(data.cardExpirationDate)
+      ) {
         context.addIssue({
           code: "custom",
-          path: ["expirationDate"],
+          path: ["cardExpirationDate"],
           message: "Campo obrigatório",
         })
       } else {
         const [month, year] = [
-          Number(data.expirationDate.slice(0, 2)),
-          Number(data.expirationDate.slice(2, 4)),
+          Number(data.cardExpirationDate.slice(0, 2)),
+          Number(data.cardExpirationDate.slice(2, 4)),
         ]
         const currentDate = new Date()
         const [currentMonth, currentYear] = [
@@ -60,15 +63,15 @@ export const formPaymentSchema = z
         ) {
           context.addIssue({
             code: "custom",
-            path: ["expirationDate"],
+            path: ["cardExpirationDate"],
             message: "Cartão vencido",
           })
         }
       }
-      if (!data.securityCode || !/^\d{3}$/.test(data.securityCode)) {
+      if (!data.cardSecurityCode || !/^\d{3}$/.test(data.cardSecurityCode)) {
         context.addIssue({
           code: "custom",
-          path: ["securityCode"],
+          path: ["cardSecurityCode"],
           message: "Campo obrigatório",
         })
       }

@@ -8,8 +8,10 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Controller, useFormContext } from "react-hook-form"
 import type { DeliveryFormData } from "./schema"
+import { useBoundStore } from "@/stores"
 
-export function FieldDelivery({ randomDay }: { randomDay: number }) {
+export function FieldDelivery() {
+  const daysOfDelivery = useBoundStore((state) => state.daysOfDelivery)
   const { control, watch } = useFormContext<DeliveryFormData>()
   const cep = watch("cep")
   if (!cep || cep.length !== 9) return null
@@ -28,7 +30,7 @@ export function FieldDelivery({ randomDay }: { randomDay: number }) {
             <FieldLabel htmlFor="sedex-delivery">
               <Field orientation="horizontal">
                 <FieldContent>
-                  <FieldTitle>Chegará em {randomDay} dias úteis</FieldTitle>
+                  <FieldTitle>Chegará em {daysOfDelivery} dias úteis</FieldTitle>
                   <FieldDescription>
                     <span className="text-green-600">Grátis</span>
                   </FieldDescription>

@@ -29,11 +29,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { formatDocument } from "@/utils/format"
+import { formatCurrency, formatDocument } from "@/utils/format"
 import { MAX_INSTALLMENTS } from "@/utils/constants"
-
-const getCurrency = (value: number, locale: string) =>
-  value.toLocaleString(locale, { style: "currency", currency: "BRL" })
+import { useBoundStore } from "@/stores"
 
 const items = Array.from({ length: MAX_INSTALLMENTS }, (_, index) => {
   const value = index + 1
@@ -41,15 +39,10 @@ const items = Array.from({ length: MAX_INSTALLMENTS }, (_, index) => {
   return {
     value,
     label(amount: number) {
-      return `${value}x de ${getCurrency(amount / value, "pt-BR")}`
+      return `${value}x de ${formatCurrency(amount / value, "pt-BR", "BRL")}`
     },
   }
 })
-
-const selectItems = items.map(({ value }) => ({
-  value,
-  label: `${value}x`,
-}))
 
 export function CreditCardForm() {
   const { control, setValue, clearErrors } = useFormContext<PaymentFormData>()
@@ -57,7 +50,12 @@ export function CreditCardForm() {
     control,
     name: "cardholderIdentificationType",
   })
-  const amount = 120
+  const totalValueCart = useBoundStore((state) => state.totalValueCart)
+
+  const selectItems = items.map(({ value, label }) => ({
+    value,
+    label: label(totalValueCart),
+  }))
 
   return (
     <>
@@ -116,16 +114,16 @@ export function CreditCardForm() {
 
       <div className="flex flex-col gap-6 sm:flex-row">
         <Controller
-          name="expirationDate"
+          name="cardExpirationDate"
           control={control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="form-payment-expirationDate">
+              <FieldLabel htmlFor="form-payment-cardExpirationDate">
                 Data de vencimento
               </FieldLabel>
               <Input
                 {...field}
-                id="form-payment-expirationDate"
+                id="form-payment-cardExpirationDate"
                 value={(field.value ?? "")
                   .replace(/\D/g, "")
                   .replace(/(\d{2})(\d{2})/g, "$1/$2")}
@@ -146,16 +144,16 @@ export function CreditCardForm() {
           )}
         />
         <Controller
-          name="securityCode"
+          name="cardSecurityCode"
           control={control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="form-payment-securityCode">
+              <FieldLabel htmlFor="form-payment-cardSecurityCode">
                 Código de segurança
               </FieldLabel>
               <Input
                 {...field}
-                id="form-payment-securityCode"
+                id="form-payment-cardSecurityCode"
                 aria-invalid={fieldState.invalid}
                 placeholder="000"
                 inputMode="numeric"
@@ -280,7 +278,7 @@ export function CreditCardForm() {
                   {items.map((item) => (
                     <SelectItem key={item.value} value={item.value}>
                       <div className="flex w-full justify-between gap-6">
-                        <span>{item.label(amount)}</span>
+                        <span>{item.label(totalValueCart)}</span>
                         <span className="text-green-600">Sem juros</span>
                       </div>
                     </SelectItem>

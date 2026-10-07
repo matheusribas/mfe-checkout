@@ -56,13 +56,16 @@ const itemVariants = cva(
   }
 )
 
+export type ItemProps = useRender.ComponentProps<"div"> &
+  VariantProps<typeof itemVariants>
+
 function Item({
   className,
   variant = "default",
   size = "default",
   render,
   ...props
-}: useRender.ComponentProps<"div"> & VariantProps<typeof itemVariants>) {
+}: ItemProps) {
   return useRender({
     defaultTagName: "div",
     props: mergeProps<"div">(

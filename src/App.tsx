@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { FormProvider, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 
@@ -13,10 +13,13 @@ import {
   formPaymentSchema,
   type PaymentFormData,
 } from "./components/features/Payment/schema"
+import { Confirmation } from "./components/features/Confirmation"
+import { toast } from "./components/ui/toast"
+import { useBoundStore } from "./stores"
 
 type TabType = "delivery" | "payment" | "confirmation"
 
-type FormData = DeliveryFormData & PaymentFormData
+export type FormData = DeliveryFormData & PaymentFormData
 
 const defaultValues: FormData = {
   method: "delivery",
@@ -28,28 +31,47 @@ const defaultValues: FormData = {
   city: "",
   delivery: "sedex",
 
-  type: "credit-card",
+  paymentType: "credit-card",
   cardNumber: "",
   cardholderName: "",
-  expirationDate: "",
-  securityCode: "",
+  cardExpirationDate: "",
+  cardSecurityCode: "",
   cardholderIdentification: "",
   cardholderIdentificationType: "cpf",
   installments: null,
 }
 
+const cart = [
+  {
+    productId: 1,
+    name: "Tênis Runner Pro",
+    quantity: 1,
+    unitPrice: 299.9,
+  },
+  {
+    productId: 3,
+    name: "Camiseta Essential",
+    quantity: 2,
+    unitPrice: 79.9,
+  },
+]
+
 export function App() {
-  const [tab, setTab] = useState<TabType>("confirmation")
-  const [tabsEnabled, setTabsEnabled] = useState<TabType[]>(['confirmation'])
+  const setCart = useBoundStore((state) => state.setCart)
+  const [tab, setTab] = useState<TabType>("delivery")
+  const [tabsEnabled, setTabsEnabled] = useState<TabType[]>(["delivery"])
 
   const form = useForm<FormData>({
     resolver: zodResolver(formDeliverySchema.and(formPaymentSchema)),
-    defaultValues
+    defaultValues,
   })
 
   const changeTab = (newTab: TabType) => {
     setTab(newTab)
-    setTabsEnabled(prev => [...prev, newTab])
+    setTabsEnabled((prev) => {
+      if (prev.find((tab) => tab === newTab)?.length) return prev
+      else return [...prev, newTab]
+    })
   }
 
   const handleValidDeliveryForm = async () => {
@@ -65,11 +87,11 @@ export function App() {
   const handleValidPaymentForm = async () => {
     const isPaymentValid = await form.trigger(
       [
-        "type",
+        "paymentType",
         "cardNumber",
         "cardholderName",
-        "expirationDate",
-        "securityCode",
+        "cardExpirationDate",
+        "cardSecurityCode",
         "cardholderIdentification",
         "cardholderIdentificationType",
         "installments",
@@ -82,15 +104,32 @@ export function App() {
   }
 
   const handleChangeTab = (newTab: TabType) => {
-    if (newTab === "payment") {
-      void handleValidDeliveryForm()
-      return
-    }
-    if (newTab === "confirmation") {
-      void handleValidPaymentForm()
-      return
+    switch (newTab) {
+      case "delivery":
+        changeTab("delivery")
+        break
+      case "payment":
+        void handleValidDeliveryForm()
+        break
+      case "confirmation":
+        void handleValidPaymentForm()
+        break
+
+      default:
+        break
     }
   }
+
+  const handleSave = () => {
+    toast.add({
+      type: "success",
+      priority: "high",
+      title: "Pedido finalizado com sucesso",
+      description: "Seu pedido foi finalizado com sucesso",
+    })
+  }
+
+  useEffect(() => setCart(cart), [setCart])
 
   return (
     <div className="flex h-full min-w-0 flex-col">
@@ -104,8 +143,10 @@ export function App() {
             >
               Pagamento
             </TabsTrigger>
-            <TabsTrigger value="confirmation"
-              disabled={!tabsEnabled.includes("confirmation")}>
+            <TabsTrigger
+              value="confirmation"
+              disabled={!tabsEnabled.includes("confirmation")}
+            >
               Confirmação
             </TabsTrigger>
           </TabsList>
@@ -116,7 +157,7 @@ export function App() {
             <Payment onValidForm={handleValidPaymentForm} />
           </TabsContent>
           <TabsContent value="confirmation">
-            Confirmation
+            <Confirmation onSave={handleSave} />
           </TabsContent>
         </Tabs>
       </FormProvider>

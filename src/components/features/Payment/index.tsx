@@ -17,13 +17,13 @@ import {
   FieldLabel,
   FieldTitle,
 } from "@/components/ui/field"
+import { ChevronRightIcon } from "lucide-react"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { type PaymentFormData } from "./schema"
 import { MAX_INSTALLMENTS } from "@/utils/constants"
 import { CreditCardForm } from "./CreditCardForm"
 import { PixInfo } from "./PixInfo"
-import { BarcodeInfo } from "./BarcodeInfo"
-import { ChevronRightIcon } from "lucide-react"
+import { BarCodeInfo } from "./BarCodeInfo"
 
 interface PaymentProps {
   onValidForm: () => void
@@ -31,15 +31,17 @@ interface PaymentProps {
 
 export function Payment({ onValidForm }: PaymentProps) {
   const { control, watch } = useFormContext<PaymentFormData>()
-  const type = watch("type")
+  const paymentType = watch("paymentType")
 
   const renderPaymentFields = () => {
-    const types = {
+    const paymentTypes = {
       "credit-card": <CreditCardForm />,
       pix: <PixInfo />,
-      boleto: <BarcodeInfo />,
+      boleto: <BarCodeInfo />,
     }
-    return types[type] !== undefined ? types[type] : null
+    return paymentTypes[paymentType] !== undefined
+      ? paymentTypes[paymentType]
+      : null
   }
 
   return (
@@ -54,7 +56,7 @@ export function Payment({ onValidForm }: PaymentProps) {
       <CardContent>
         <FieldGroup>
           <Controller
-            name="type"
+            name="paymentType"
             control={control}
             render={({ field }) => (
               <RadioGroup
