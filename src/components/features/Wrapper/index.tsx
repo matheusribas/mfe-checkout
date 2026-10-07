@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useCallback, useState } from "react"
 import { FormProvider, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 
@@ -48,6 +48,7 @@ export function Wrapper() {
     resolver: zodResolver(formDeliverySchema.and(formPaymentSchema)),
     defaultValues,
   })
+  const { reset } = form
 
   const changeTab = (newTab: TabType) => {
     setTab(newTab)
@@ -123,6 +124,12 @@ export function Wrapper() {
     openModal("confirm-order")
   }
 
+  const handleReset = useCallback(async () => {
+    void reset()
+    setTab("delivery")
+    setTabsEnabled(["delivery"])
+  }, [reset])
+
   return (
     <div className="flex h-full min-w-0 flex-col">
       <FormProvider {...form}>
@@ -156,6 +163,7 @@ export function Wrapper() {
           data={mutateOrder.data}
           isSuccess={mutateOrder.isSuccess}
           isError={mutateOrder.isError}
+          onClose={handleReset}
         />
       </FormProvider>
     </div>

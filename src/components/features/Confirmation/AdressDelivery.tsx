@@ -1,4 +1,3 @@
-import type { CheckoutFormType } from "@/App"
 import { useFormContext } from "react-hook-form"
 
 import {
@@ -10,6 +9,7 @@ import {
 } from "@/components/ui/item"
 import { MapPinIcon } from "lucide-react"
 import { useBoundStore } from "@/stores"
+import type { CheckoutFormType } from "@/components/shared/types"
 
 export function AdressDelivery() {
   const { watch } = useFormContext<CheckoutFormType>()

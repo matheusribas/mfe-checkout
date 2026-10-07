@@ -1,4 +1,4 @@
-import type { CheckoutFormType } from "@/App"
+import type { CheckoutFormType } from "@/components/shared/types"
 import {
   Item,
   ItemContent,
@@ -36,22 +36,24 @@ export function PaymentCreditCard() {
       </ItemMedia>
       <ItemContent>
         <ItemTitle>Pagamento com Cartão de Crédito</ItemTitle>
-        <ItemDescription className="mt-2 flex flex-col gap-2">
+        <div className="mt-2 flex flex-col gap-2">
           <div className="flex items-center gap-2">
             <Skeleton className="h-3 w-7.5 animate-none" />
             <Skeleton className="h-3 w-7.5 animate-none" />
             <Skeleton className="h-3 w-7.5 animate-none" />
-            <span>{cardNumber?.slice(-4)}</span>
+            <span className="text-muted-foreground">
+              {cardNumber?.slice(-4)}
+            </span>
           </div>
           <div className="flex items-center gap-2">
-            <span>{cardholderName}</span>-
-            <span>
+            <span className="text-muted-foreground">{cardholderName}</span>-
+            <span className="text-muted-foreground">
               {String(cardExpirationDate).slice(0, 2)}/
               {String(cardExpirationDate).slice(-2)}
             </span>
-            -<span>{cardSecurityCode}</span>
+            -<span className="text-muted-foreground">{cardSecurityCode}</span>
           </div>
-        </ItemDescription>
+        </div>
         <ItemDescription>
           <span className="uppercase">{cardholderIdentificationType}</span>:{" "}
           {formatDocument(

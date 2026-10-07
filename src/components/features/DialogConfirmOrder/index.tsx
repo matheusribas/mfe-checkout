@@ -9,16 +9,19 @@ import { useBoundStore } from "@/stores"
 import type { OrderCreateType } from "@/components/shared/types"
 import { useMutationPatchOrder } from "@/api/hooks/checkout/useMutationPatchOrder"
 import confetti from "canvas-confetti"
+import { delay } from "@/utils/apis"
 
 interface DialogConfirmOrderProps {
   data?: OrderCreateType
   isSuccess: boolean
   isError: boolean
+  onClose: () => Promise<void>
 }
 export function DialogConfirmOrder({
   data,
   isSuccess,
   isError,
+  onClose,
 }: DialogConfirmOrderProps) {
   const mutatePatchOrder = useMutationPatchOrder()
   const modalIsOpen = useBoundStore((state) => state.modalIsOpen)
@@ -32,7 +35,7 @@ export function DialogConfirmOrder({
       : undefined
   const statusOrder = patchedOrder?.status ?? data?.status ?? "pending"
 
-  const handleOpenChange = (open: boolean) => {
+  const handleModalChange = (open: boolean) => {
     if (!open) closeModal("confirm-order")
   }
 
@@ -82,6 +85,12 @@ export function DialogConfirmOrder({
     mutatePatchOrder.isPending,
   ])
 
+  const handleReset = useCallback(async () => {
+    await delay(1000)
+    onClose()
+    closeModal("confirm-order")
+  }, [closeModal, onClose])
+
   useEffect(() => {
     if (isSuccess && statusOrder === "paid") {
       confetti({
@@ -89,11 +98,13 @@ export function DialogConfirmOrder({
         spread: 70,
         origin: { y: 0.6 },
       })
+
+      handleReset()
     }
-  }, [isSuccess, statusOrder])
+  }, [isSuccess, statusOrder, handleReset])
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+    <Dialog open={isOpen} onOpenChange={handleModalChange}>
       <DialogContent
         showCloseButton={false}
         className="flex min-h-100 flex-1 flex-col items-center justify-center gap-6 sm:max-w-sm"
