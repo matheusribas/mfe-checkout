@@ -3,7 +3,7 @@ import * as z from "zod"
 
 export const formPaymentSchema = z
   .object({
-    paymentType: z.enum(["credit-card", "pix", "boleto"]),
+    paymentType: z.enum(["credit-card", "pix", "bar-code"]),
     cardNumber: z.string().optional(),
     cardholderName: z.string().optional(),
     cardExpirationDate: z.string().optional(),

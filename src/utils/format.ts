@@ -1,3 +1,9 @@
+import type {
+  CartItemType,
+  CheckoutFormType,
+  OrderType,
+} from "@/components/shared/types"
+
 export function formatDocument(
   value: string | undefined,
   type: "cpf" | "cnpj"
@@ -43,4 +49,34 @@ export function formatCurrency(
   currency: string
 ) {
   return value.toLocaleString(locale, { style: "currency", currency })
+}
+
+type FormatOrderType = CheckoutFormType & { items: CartItemType[] }
+
+export function formatOrder(order: FormatOrderType): OrderType {
+  return {
+    status: order.paymentType === "credit-card" ? "paid" : "pending",
+    items: order.items,
+    shippingAddress: {
+      method: order.method,
+      cep: order.cep,
+      adress: order.adress,
+      number: order.number,
+      complement: order.complement,
+      uf: order.uf,
+      city: order.city,
+      delivery: order.delivery,
+    },
+    payment: {
+      paymentType: order.paymentType,
+      cardNumber: order.cardNumber,
+      cardholderName: order.cardholderName,
+      cardExpirationDate: order.cardExpirationDate,
+      cardSecurityCode: order.cardSecurityCode,
+      cardholderIdentification: order.cardholderIdentification,
+      cardholderIdentificationType: order.cardholderIdentificationType,
+      installments: order.installments,
+    },
+    createdAt: new Date().toISOString(),
+  }
 }

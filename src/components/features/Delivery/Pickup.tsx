@@ -1,4 +1,4 @@
-import { PickupItem } from "@/components/shared/PickupItem"
+import { PickupItem } from "@/components/shared/components/PickupItem"
 
 export function Pickup() {
   return (

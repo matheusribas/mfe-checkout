@@ -19,20 +19,20 @@ import { useBoundStore } from "@/stores"
 import { formatCurrency } from "@/utils/format"
 import { CheckIcon, ShoppingBagIcon } from "lucide-react"
 import { useFormContext } from "react-hook-form"
-import type { FormData } from "@/App"
-import { PickupItem } from "@/components/shared/PickupItem"
+import { PickupItem } from "@/components/shared/components/PickupItem"
 import { AdressDelivery } from "./AdressDelivery"
 import { PaymentCreditCard } from "./PaymentCreditCard"
-import { PaymentPixItem } from "@/components/shared/PaymentPixItem"
-import { PaymentBarCodeItem } from "@/components/shared/PaymentBarCodeItem"
+import { PaymentPixItem } from "@/components/shared/components/PaymentPixItem"
+import { PaymentBarCodeItem } from "@/components/shared/components/PaymentBarCodeItem"
 import { Separator } from "@/components/ui/separator"
+import type { CheckoutFormType } from "@/components/shared/types"
 
 interface ConfirmationProps {
   onSave: () => void
 }
 
 export function Confirmation({ onSave }: ConfirmationProps) {
-  const { watch } = useFormContext<FormData>()
+  const { watch } = useFormContext<CheckoutFormType>()
   const [method, paymentType] = watch(["method", "paymentType"])
   const cart = useBoundStore((state) => state.cart)
 
@@ -40,7 +40,7 @@ export function Confirmation({ onSave }: ConfirmationProps) {
     const paymentTypes = {
       "credit-card": <PaymentCreditCard />,
       pix: <PaymentPixItem />,
-      boleto: <PaymentBarCodeItem />,
+      "bar-code": <PaymentBarCodeItem />,
     }
     return paymentTypes[paymentType] !== undefined
       ? paymentTypes[paymentType]

@@ -1,4 +1,4 @@
-import { PaymentPixItem } from "@/components/shared/PaymentPixItem"
+import { PaymentPixItem } from "@/components/shared/components/PaymentPixItem"
 
 export function PixInfo() {
   return (

@@ -1,11 +1,5 @@
+import type { CartItemType } from "@/components/shared/types"
 import { create, type StateCreator } from "zustand"
-
-interface CartItemType {
-  productId: number
-  name: string
-  quantity: number
-  unitPrice: number
-}
 
 interface CartSlice {
   cart: CartItemType[]
@@ -16,6 +10,15 @@ interface CartSlice {
 interface DeliverySlice {
   daysOfDelivery: number
   setDaysOfDelivery: (days: number) => void
+}
+
+type ModalType = "confirm-order"
+
+interface ModalStateType {
+  modalIsOpen: boolean
+  modal: ModalType | null
+  openModal: (modal: ModalType) => void
+  closeModal: (modal: ModalType) => void
 }
 
 const createCartSlice: StateCreator<CartSlice, [], [], CartSlice> = (set) => ({
@@ -32,7 +35,12 @@ const createCartSlice: StateCreator<CartSlice, [], [], CartSlice> = (set) => ({
     })),
 })
 
-const createDeliverySlice: StateCreator<DeliverySlice, [], [], DeliverySlice> = (set) => ({
+const createDeliverySlice: StateCreator<
+  DeliverySlice,
+  [],
+  [],
+  DeliverySlice
+> = (set) => ({
   daysOfDelivery: 1,
   setDaysOfDelivery: (days: number) =>
     set(() => ({
@@ -40,7 +48,19 @@ const createDeliverySlice: StateCreator<DeliverySlice, [], [], DeliverySlice> = 
     })),
 })
 
-export const useBoundStore = create<CartSlice & DeliverySlice>()((...a) => ({
+const createModalSlice: StateCreator<ModalStateType, [], [], ModalStateType> = (
+  set
+) => ({
+  modalIsOpen: false,
+  modal: null,
+  openModal: (modal: ModalType) => set(() => ({ modalIsOpen: true, modal })),
+  closeModal: (modal: ModalType) => set(() => ({ modalIsOpen: false, modal })),
+})
+
+export const useBoundStore = create<
+  CartSlice & DeliverySlice & ModalStateType
+>()((...a) => ({
   ...createCartSlice(...a),
   ...createDeliverySlice(...a),
+  ...createModalSlice(...a),
 }))

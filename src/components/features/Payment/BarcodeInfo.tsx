@@ -1,4 +1,4 @@
-import { PaymentBarCodeItem } from "@/components/shared/PaymentBarCodeItem"
+import { PaymentBarCodeItem } from "@/components/shared/components/PaymentBarCodeItem"
 
 export function BarCodeInfo() {
   return (

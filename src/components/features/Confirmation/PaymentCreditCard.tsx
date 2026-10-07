@@ -1,4 +1,4 @@
-import type { FormData } from "@/App"
+import type { CheckoutFormType } from "@/App"
 import {
   Item,
   ItemContent,
@@ -12,7 +12,7 @@ import { CreditCardIcon } from "lucide-react"
 import { useFormContext } from "react-hook-form"
 
 export function PaymentCreditCard() {
-  const { watch } = useFormContext<FormData>()
+  const { watch } = useFormContext<CheckoutFormType>()
   const [
     cardNumber,
     cardExpirationDate,

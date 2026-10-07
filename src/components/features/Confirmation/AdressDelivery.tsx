@@ -1,4 +1,4 @@
-import type { FormData } from "@/App"
+import type { CheckoutFormType } from "@/App"
 import { useFormContext } from "react-hook-form"
 
 import {
@@ -12,7 +12,7 @@ import { MapPinIcon } from "lucide-react"
 import { useBoundStore } from "@/stores"
 
 export function AdressDelivery() {
-  const { watch } = useFormContext<FormData>()
+  const { watch } = useFormContext<CheckoutFormType>()
   const [adress, number, complement, city, uf] = watch([
     "adress",
     "number",

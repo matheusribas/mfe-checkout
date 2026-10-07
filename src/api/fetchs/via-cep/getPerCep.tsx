@@ -1,4 +1,4 @@
-const API_VIA_CEP = "https://viacep.com.br/ws"
+import { API_VIA_CEP } from "@/utils/apis"
 
 interface CepResponseError {
   erro: "true"

@@ -37,7 +37,7 @@ export function Payment({ onValidForm }: PaymentProps) {
     const paymentTypes = {
       "credit-card": <CreditCardForm />,
       pix: <PixInfo />,
-      boleto: <BarCodeInfo />,
+      "bar-code": <BarCodeInfo />,
     }
     return paymentTypes[paymentType] !== undefined
       ? paymentTypes[paymentType]
@@ -89,7 +89,7 @@ export function Payment({ onValidForm }: PaymentProps) {
                     <RadioGroupItem value="pix" id="pix-method" />
                   </Field>
                 </FieldLabel>
-                <FieldLabel htmlFor="boleto-method">
+                <FieldLabel htmlFor="bar-code-method">
                   <Field orientation="horizontal">
                     <FieldContent>
                       <FieldTitle>Boleto</FieldTitle>
@@ -97,7 +97,7 @@ export function Payment({ onValidForm }: PaymentProps) {
                         Aprovação em 2 dias úteis
                       </FieldDescription>
                     </FieldContent>
-                    <RadioGroupItem value="boleto" id="boleto-method" />
+                    <RadioGroupItem value="bar-code" id="bar-code-method" />
                   </Field>
                 </FieldLabel>
               </RadioGroup>
