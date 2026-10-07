@@ -35,8 +35,7 @@ export function Delivery({ onValidForm }: DeliveryProps) {
       <CardHeader>
         <CardTitle>Forma de Entrega</CardTitle>
         <CardDescription>
-          Escolha a forma de entrega que deseja utilizar para receber seu
-          pedido.
+          Escolha a forma de entrega que deseja utilizar para receber seu pedido
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -84,7 +83,7 @@ export function Delivery({ onValidForm }: DeliveryProps) {
       </CardContent>
       <CardFooter>
         <Field orientation="horizontal" className="w-full justify-end">
-          <Button type="submit" onClick={onValidForm}>
+          <Button onClick={onValidForm}>
             Ir para pagamento
             <ChevronRightIcon />
           </Button>

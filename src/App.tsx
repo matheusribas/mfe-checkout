@@ -1,43 +1,95 @@
-import { Delivery } from "@/components/features/Delivery"
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
+import { useState } from "react"
 import { FormProvider, useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import {
   formDeliverySchema,
   type DeliveryFormData,
 } from "@/components/features/Delivery/schema"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useState } from "react"
+import { Delivery } from "@/components/features/Delivery"
+import { Payment } from "@/components/features/Payment"
+import {
+  formPaymentSchema,
+  type PaymentFormData,
+} from "./components/features/Payment/schema"
 
-type TabType = "delivery" | "payment"
+type TabType = "delivery" | "payment" | "confirmation"
+
+type FormData = DeliveryFormData & PaymentFormData
+
+const defaultValues: FormData = {
+  method: "delivery",
+  cep: "",
+  adress: "",
+  number: "",
+  complement: "",
+  uf: "",
+  city: "",
+  delivery: "sedex",
+
+  type: "credit-card",
+  cardNumber: "",
+  cardholderName: "",
+  expirationDate: "",
+  securityCode: "",
+  cardholderIdentification: "",
+  cardholderIdentificationType: "cpf",
+  installments: null,
+}
 
 export function App() {
-  const [tab, setTab] = useState<TabType>("delivery")
+  const [tab, setTab] = useState<TabType>("confirmation")
+  const [tabsEnabled, setTabsEnabled] = useState<TabType[]>(['confirmation'])
 
-  const form = useForm<DeliveryFormData>({
-    resolver: zodResolver(formDeliverySchema),
-    defaultValues: {
-      method: "delivery",
-      cep: "",
-      adress: "",
-      number: "",
-      complement: "",
-      uf: "",
-      city: "",
-      delivery: "sedex",
-    },
+  const form = useForm<FormData>({
+    resolver: zodResolver(formDeliverySchema.and(formPaymentSchema)),
+    defaultValues
   })
 
-  const handleValidDeliveryForm = () => {
-    // TODO: validar e passar para proxima tab
+  const changeTab = (newTab: TabType) => {
+    setTab(newTab)
+    setTabsEnabled(prev => [...prev, newTab])
+  }
 
-    setTab("payment")
+  const handleValidDeliveryForm = async () => {
+    const isDeliveryValid = await form.trigger(
+      ["method", "cep", "adress", "number", "uf", "city", "delivery"],
+      { shouldFocus: true }
+    )
+
+    if (!isDeliveryValid) return
+    changeTab("payment")
+  }
+
+  const handleValidPaymentForm = async () => {
+    const isPaymentValid = await form.trigger(
+      [
+        "type",
+        "cardNumber",
+        "cardholderName",
+        "expirationDate",
+        "securityCode",
+        "cardholderIdentification",
+        "cardholderIdentificationType",
+        "installments",
+      ],
+      { shouldFocus: true }
+    )
+
+    if (!isPaymentValid) return
+    changeTab("confirmation")
   }
 
   const handleChangeTab = (newTab: TabType) => {
     if (newTab === "payment") {
-      // TODO: validar deliveryForm antes de ir para proxima payment
+      void handleValidDeliveryForm()
+      return
     }
-    setTab(newTab)
+    if (newTab === "confirmation") {
+      void handleValidPaymentForm()
+      return
+    }
   }
 
   return (
@@ -48,16 +100,24 @@ export function App() {
             <TabsTrigger value="delivery">Entrega</TabsTrigger>
             <TabsTrigger
               value="payment"
-              // disabled
-              // TODO: desabilitar se deliveryForm não estiver validado
+              disabled={!tabsEnabled.includes("payment")}
             >
               Pagamento
+            </TabsTrigger>
+            <TabsTrigger value="confirmation"
+              disabled={!tabsEnabled.includes("confirmation")}>
+              Confirmação
             </TabsTrigger>
           </TabsList>
           <TabsContent value="delivery">
             <Delivery onValidForm={handleValidDeliveryForm} />
           </TabsContent>
-          <TabsContent value="payment">Pagamento</TabsContent>
+          <TabsContent value="payment">
+            <Payment onValidForm={handleValidPaymentForm} />
+          </TabsContent>
+          <TabsContent value="confirmation">
+            Confirmation
+          </TabsContent>
         </Tabs>
       </FormProvider>
     </div>

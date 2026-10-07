@@ -1,14 +1,7 @@
 import { useEffect, useState } from "react"
 import { Controller, useFormContext } from "react-hook-form"
 import type { DeliveryFormData } from "./schema"
-import {
-  Field,
-  FieldContent,
-  FieldDescription,
-  FieldError,
-  FieldLabel,
-  FieldTitle,
-} from "@/components/ui/field"
+import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { useMutationPerCep } from "@/api/hooks/via-cep/useMutationPerCep"
 import { sanitizedCep } from "@/utils/sanitize"
@@ -19,17 +12,15 @@ import {
 } from "@/components/ui/input-group"
 import { Spinner } from "@/components/ui/spinner"
 import { toast } from "@/components/ui/toast"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { FieldDelivery } from "./FieldDelivery"
 
 export function DeliveryForm() {
   const { setValue, clearErrors, control } = useFormContext<DeliveryFormData>()
   const { mutateAsync, data, isPending, isError } = useMutationPerCep()
   const [randomDay, setRandomDay] = useState<number>(1)
 
-  const isErrorCepData = !!(data && "erro" in data)
+  const isErrorCepData = !!(data && "erro" in data) || isError
   const cepData = data && !isErrorCepData ? data : undefined
-  const disabledFields =
-    isPending || isError || isErrorCepData || cepData === undefined
 
   useEffect(() => {
     if (!isErrorCepData) return
@@ -113,17 +104,12 @@ export function DeliveryForm() {
           name="adress"
           control={control}
           render={({ field, fieldState }) => (
-            <Field
-              data-invalid={fieldState.invalid}
-              data-disabled={disabledFields}
-            >
+            <Field data-invalid={fieldState.invalid}>
               <FieldLabel htmlFor="form-delivery-adress">Endereço</FieldLabel>
               <Input
                 {...field}
                 id="form-delivery-adress"
                 aria-invalid={fieldState.invalid}
-                aria-disabled={disabledFields}
-                disabled={disabledFields}
                 placeholder="Rua Exemplo"
               />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
@@ -133,19 +119,12 @@ export function DeliveryForm() {
         <Controller
           name="number"
           control={control}
-          disabled={disabledFields}
           render={({ field, fieldState }) => (
-            <Field
-              data-invalid={fieldState.invalid}
-              className="sm:w-42"
-              data-disabled={disabledFields}
-            >
+            <Field data-invalid={fieldState.invalid} className="sm:w-42">
               <FieldLabel htmlFor="form-delivery-number">Número</FieldLabel>
               <Input
                 {...field}
                 id="form-delivery-number"
-                aria-disabled={disabledFields}
-                disabled={disabledFields}
                 aria-invalid={fieldState.invalid}
                 placeholder="000"
               />
@@ -159,17 +138,11 @@ export function DeliveryForm() {
           name="uf"
           control={control}
           render={({ field, fieldState }) => (
-            <Field
-              data-invalid={fieldState.invalid}
-              className="sm:w-42"
-              data-disabled={disabledFields}
-            >
+            <Field data-invalid={fieldState.invalid} className="sm:w-42">
               <FieldLabel htmlFor="form-delivery-uf">Estado</FieldLabel>
               <Input
                 {...field}
                 id="form-delivery-uf"
-                aria-disabled={disabledFields}
-                disabled={disabledFields}
                 placeholder="XX"
                 aria-invalid={fieldState.invalid}
               />
@@ -181,16 +154,11 @@ export function DeliveryForm() {
           name="city"
           control={control}
           render={({ field, fieldState }) => (
-            <Field
-              data-invalid={fieldState.invalid}
-              data-disabled={disabledFields}
-            >
+            <Field data-invalid={fieldState.invalid}>
               <FieldLabel htmlFor="form-delivery-city">Cidade</FieldLabel>
               <Input
                 {...field}
                 id="form-delivery-city"
-                aria-disabled={disabledFields}
-                disabled={disabledFields}
                 aria-invalid={fieldState.invalid}
                 placeholder="XXX XXXXX"
               />
@@ -202,20 +170,14 @@ export function DeliveryForm() {
       <Controller
         name="complement"
         control={control}
-        disabled={disabledFields}
         render={({ field, fieldState }) => (
-          <Field
-            data-invalid={fieldState.invalid}
-            data-disabled={disabledFields}
-          >
+          <Field data-invalid={fieldState.invalid}>
             <FieldLabel htmlFor="form-delivery-complement">
               Complemento
             </FieldLabel>
             <Input
               {...field}
               id="form-delivery-complement"
-              aria-disabled={disabledFields}
-              disabled={disabledFields}
               aria-invalid={fieldState.invalid}
             />
             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
@@ -223,33 +185,7 @@ export function DeliveryForm() {
         )}
       />
 
-      {!disabledFields && (
-        <div className="flex flex-col gap-6 sm:flex-row">
-          <Controller
-            name="delivery"
-            control={control}
-            render={({ field }) => (
-              <RadioGroup
-                value={field.value}
-                onValueChange={field.onChange}
-                className="max-w-sm"
-              >
-                <FieldLabel htmlFor="sedex-delivery">
-                  <Field orientation="horizontal">
-                    <FieldContent>
-                      <FieldTitle>Chegará em {randomDay} dias úteis</FieldTitle>
-                      <FieldDescription>
-                        <span className="text-green-600">Grátis</span>
-                      </FieldDescription>
-                    </FieldContent>
-                    <RadioGroupItem value="sedex" id="sedex-delivery" />
-                  </Field>
-                </FieldLabel>
-              </RadioGroup>
-            )}
-          />
-        </div>
-      )}
+      {!isErrorCepData && <FieldDelivery randomDay={randomDay} />}
     </>
   )
 }
